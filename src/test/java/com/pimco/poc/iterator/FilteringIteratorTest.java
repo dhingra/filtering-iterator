@@ -72,17 +72,71 @@ public class FilteringIteratorTest {
         it.next();
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void filteringIteratorRemoveElement(){
-        final List<Integer> list = Arrays.asList(5,1,24,36,42,5,64,27,83,29,50);
+    @Test
+    public void testRemoveRemovesElementFromUnderlyingCollection(){
+    	
+    	int elementToRemove=36;
+        final List<Integer> list = new ArrayList<>(Arrays.asList(5,1,24,elementToRemove,42,5,64,27,83,29,50));
+        
+        assertEquals(true,list.contains(elementToRemove));
+        
+        int initialSize=list.size();
         final Iterator<Integer> it = new FilteringIterator<>(list.listIterator(),evenPredicate);
         while(it.hasNext() ) {
             int k = it.next();
-            if (36 == k){
+            if (elementToRemove == k){ 
                 it.remove();
             }
         }
-        //assertEquals(false,list.contains(36));
-        //assertEquals(10,list.size());
+        
+        assertEquals(initialSize-1, list.size());
+        assertFalse(list.contains(elementToRemove));
     }
+
+    @Test
+    public void testRemoveRemovesAllInstancesOfElementFromUnderlyingCollection(){
+    	
+    	int elementToRemove=36;
+        final List<Integer> list = new ArrayList<>(Arrays.asList(5,1,24,elementToRemove,42,5,64,27,elementToRemove,83,29,elementToRemove,50,elementToRemove));
+        
+        assertEquals(true,list.contains(elementToRemove));
+        
+        int initialSize=list.size();
+        final Iterator<Integer> it = new FilteringIterator<>(list.listIterator(),evenPredicate);
+        while(it.hasNext() ) {
+            int k = it.next();
+            if (elementToRemove == k){ 
+                it.remove();
+            }
+        }
+        
+        assertEquals(initialSize-4, list.size());
+        assertFalse(list.contains(elementToRemove));
+    }
+
+    @Test
+    public void testRemoveRetainsOtherInstancesIfOnlyFirstIsRemoved(){
+    	
+    	int elementToRemove=36;
+        final List<Integer> list = new ArrayList<>(Arrays.asList(5,1,24,elementToRemove,42,5,64,27,elementToRemove,83,29,elementToRemove,50,elementToRemove));
+        final List<Integer> expectedList = new ArrayList<>(Arrays.asList(5,1,24,42,5,64,27,elementToRemove,83,29,elementToRemove,50,elementToRemove)); //expected 
+
+        assertEquals(true,list.contains(elementToRemove));
+        
+        int initialSize=list.size();
+        final Iterator<Integer> it = new FilteringIterator<>(list.listIterator(),evenPredicate);
+        while(it.hasNext() ) {
+            int k = it.next();
+            if (elementToRemove == k){ 
+                it.remove();
+                break;
+            }
+        }
+        
+        assertEquals(initialSize-1, list.size());
+        assertEquals(true,list.contains(elementToRemove));
+        assertEquals(expectedList,list);
+
+    }
+
 }

@@ -1,10 +1,9 @@
 package com.pimco.poc.iterator;
 
-import function.IObjectTest;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.function.Consumer;
+
+import function.IObjectTest;
 
 /**
  * @author rohitdhingra
@@ -15,21 +14,21 @@ public class FilteringIterator<T> implements Iterator<T> {
     private T nextElement;
     private boolean hasNext;
 
-    public FilteringIterator(final Iterator it, final IObjectTest<T> test) {
+    public FilteringIterator(final Iterator<T> it, final IObjectTest<T> test) {
         iterator = it;
         predicate = test;
     }
 
     @Override
     public boolean hasNext() {
+        hasNext = false;
         while (iterator.hasNext()) {
             nextElement = iterator.next();
             if (predicate.test(nextElement)) {
                 hasNext = true;
-                return hasNext;
+                break;
             }
         }
-        hasNext = false;
         return hasNext;
     }
 
@@ -48,12 +47,7 @@ public class FilteringIterator<T> implements Iterator<T> {
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException();
+    	iterator.remove();
     }
 
-    @Override
-    public void forEachRemaining(Consumer action) {
-        while (hasNext())
-            action.accept(next());
-    }
 }
